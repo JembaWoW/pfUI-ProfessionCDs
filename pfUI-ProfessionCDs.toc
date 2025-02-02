@@ -1,0 +1,8 @@
+## Interface: 11200
+## Title: |cff33ffccpf|cffffffffUI|cffaaaaaa |cfff5a9b8[ProfessionCDs]
+## Author: Jemba
+## Notes: A pfUI extention for keeping track of your profession CDs across all of your alts.
+## Version: 1.0
+## SavedVariables: ProfessionCDs
+## Dependencies: pfUI
+pfUI-ProfessionCDs.lua
