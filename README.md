@@ -8,5 +8,5 @@ You will also need to manually open up your Alchemy and Tailoring professions on
 
 **TODO**
 
-* (Optional) Minimap button with it's own interface, with profession CDs display. (Removes pfUI dependency)
+* (Optional) Minimap button with it's own interface, for profession CDs display. (Removes pfUI dependency)
 * Multi-Account support via SuperWoW.
