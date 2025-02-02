@@ -39,7 +39,7 @@ pfUI:RegisterModule("ProfessionCDs", "vanilla", function ()
 						local salt = green.."Ready!"
 						if not tbl["SaltCD"] then salt = red.."Unknown" end
 						if tbl["SaltCD"] and time() < tbl["SaltCD"] then salt = red..SecondsToTime(tbl["SaltCD"] - time()) end
-						GameTooltip:AddDoubleLine("Refind Salt", salt)
+						GameTooltip:AddDoubleLine("Refined Salt", salt)
 					end
 				else
 					GameTooltip:AddLine("No cooldown data found.")
