@@ -1,6 +1,9 @@
 local playerName = UnitName("player")
 ProfessionCDs = {}
 ProfessionCDs[playerName] = {}
+pfUI:UpdateConfig("ProfessionCDs", nil, "mooncloth", "1")
+pfUI:UpdateConfig("ProfessionCDs", nil, "transmute", "1")
+pfUI:UpdateConfig("ProfessionCDs", nil, "salt", "1")
 
 pfUI:RegisterModule("ProfessionCDs", "vanilla", function ()
 
@@ -30,10 +33,15 @@ pfUI:RegisterModule("ProfessionCDs", "vanilla", function ()
 
 	if pfUI.gui.CreateGUIEntry then -- new pfUI
 			pfUI.gui.CreateGUIEntry(T["Thirdparty"], T["Profession CDs"], function()
-			CreateConfig(nil, T["Profession CDs |cffffffffby |cfff5a9b8Jemba"], nil, nil, "header")
+			CreateConfig(nil, T["Profession Cooldowns |cffffffffby |cfff5a9b8Jemba"], nil, nil, "header")
 			CreateConfig(nil, nil, nil, nil, "header")
 			CreateConfig(nil, T["Display Current Character"], C.ProfessionCDs, "currentChar", "dropdown", pfUI.gui.dropdowns.ProfessionCDs_currentChar)
 			CreateConfig(nil, T["Display X Upcoming CDs"], C.ProfessionCDs, "upcoming", "dropdown", pfUI.gui.dropdowns.ProfessionCDs_upcoming)
+			CreateConfig(nil, nil, nil, nil, "header")
+			CreateConfig(nil, T["Display Mooncloth CDs"], C.ProfessionCDs, "mooncloth", "checkbox")
+			CreateConfig(nil, T["Display Transmute CDs"], C.ProfessionCDs, "transmute", "checkbox")
+			CreateConfig(nil, T["Display Refined Salt CDs"], C.ProfessionCDs, "salt", "checkbox")
+			CreateConfig(nil, nil, nil, nil, "header")
 			CreateConfig(nil, T["Website"], nil, nil, "button", function()
 				pfUI.chat.urlcopy.CopyText("https://github.com/JembaWoW/pfUI-ProfessionCDs")
 			end)
@@ -71,13 +79,48 @@ pfUI:RegisterModule("ProfessionCDs", "vanilla", function ()
 			GameTooltip_SetDefaultAnchor(GameTooltip, this)
 			GameTooltip:ClearLines()
 
+			GameTooltip:AddLine("Profession Cooldowns |cffffffffby |cfff5a9b8Jemba")
+			GameTooltip:AddLine(" ")
+
+			if C.ProfessionCDs.currentChar == "enabled" then
+				for name, tbl in pairs(ProfessionCDs) do
+					if name == playerName then
+						if tbl["Tailoring"] or tbl["Alchemy"] or tbl["Leatherworking"] then
+							GameTooltip:AddLine("|cfff5a9b8"..name)
+							if tbl["Tailoring"] and C.ProfessionCDs.mooncloth == "1" then
+								local mooncloth = green.."Ready!"
+								if not tbl["MoonclothCD"] then mooncloth = red.."Unknown" end
+								if tbl["MoonclothCD"] and time() < tbl["MoonclothCD"] then mooncloth = red..SecondsToTime(tbl["MoonclothCD"] - time()) end
+								GameTooltip:AddDoubleLine("Mooncloth", mooncloth)
+							end
+							if tbl["Alchemy"] and C.ProfessionCDs.transmute == "1" then
+								local arcanite = green.."Ready!"
+								if not tbl["AlchCD"] then arcanite = red.."Unknown" end
+								if tbl["AlchCD"] and time() < tbl["AlchCD"] then arcanite = red..SecondsToTime(tbl["AlchCD"] - time()) end
+								GameTooltip:AddDoubleLine("Transmute", arcanite)
+							end
+							if tbl["Leatherworking"] and C.ProfessionCDs.salt == "1" then
+								local salt = green.."Ready!"
+								if not tbl["SaltCD"] then salt = red.."Unknown" end
+								if tbl["SaltCD"] and time() < tbl["SaltCD"] then salt = red..SecondsToTime(tbl["SaltCD"] - time()) end
+								GameTooltip:AddDoubleLine("Refined Salt", salt)
+							end
+						else
+							GameTooltip:AddLine("No cooldown data found.")
+							GameTooltip:AddLine("Please open up your professions.")
+						end
+					end
+				end
+				GameTooltip:AddLine(" ")
+			end
+
 			if C.ProfessionCDs.upcoming ~= "disabled" then
 				local displayAmount = tonumber(C.ProfessionCDs.upcoming)
 				local ShortCD = ProfessionCDsShortestCD()
 				local len = table.getn(ShortCD)
 				if table.getn(ShortCD) > displayAmount then len = displayAmount end
 
-				GameTooltip:AddLine("Profession Cooldowns")
+				GameTooltip:AddLine("Upcoming Cooldowns")
 				GameTooltip:AddLine(" ")
 
 				--for i=1,len do
@@ -116,37 +159,6 @@ pfUI:RegisterModule("ProfessionCDs", "vanilla", function ()
 				end
 			end
 
-			if C.ProfessionCDs.currentChar == "enabled" then
-				for name, tbl in pairs(ProfessionCDs) do
-					if name == playerName then
-						if tbl["Tailoring"] or tbl["Alchemy"] or tbl["Leatherworking"] then
-							GameTooltip:AddLine(" ")
-							GameTooltip:AddLine("|cfff5a9b8"..name)
-							if tbl["Tailoring"] then
-								local mooncloth = green.."Ready!"
-								if not tbl["MoonclothCD"] then mooncloth = red.."Unknown" end
-								if tbl["MoonclothCD"] and time() < tbl["MoonclothCD"] then mooncloth = red..SecondsToTime(tbl["MoonclothCD"] - time()) end
-								GameTooltip:AddDoubleLine("Mooncloth", mooncloth)
-							end
-							if tbl["Alchemy"] then
-								local arcanite = green.."Ready!"
-								if not tbl["AlchCD"] then arcanite = red.."Unknown" end
-								if tbl["AlchCD"] and time() < tbl["AlchCD"] then arcanite = red..SecondsToTime(tbl["AlchCD"] - time()) end
-								GameTooltip:AddDoubleLine("Transmute", arcanite)
-							end
-							if tbl["Leatherworking"] then
-								local salt = green.."Ready!"
-								if not tbl["SaltCD"] then salt = red.."Unknown" end
-								if tbl["SaltCD"] and time() < tbl["SaltCD"] then salt = red..SecondsToTime(tbl["SaltCD"] - time()) end
-								GameTooltip:AddDoubleLine("Refined Salt", salt)
-							end
-						else
-							GameTooltip:AddLine("No cooldown data found.")
-							GameTooltip:AddLine("Please open up your professions.")
-						end
-					end
-				end
-			end
 			GameTooltip:Show()
 		end
 
@@ -242,13 +254,13 @@ end)
 function ProfessionCDsShortestCD()
 	local tempTBL = {}
 	for player, tbl in pairs(ProfessionCDs) do
-		if tbl["Tailoring"] and tbl["MoonclothCD"] then
+		if tbl["Tailoring"] and tbl["MoonclothCD"] and pfUI_config.ProfessionCDs.mooncloth == "1" then
 			tempTBL[player..",MoonclothCD"] = tbl["MoonclothCD"]
 		end
-		if tbl["Alchemy"] and tbl["AlchCD"] then
+		if tbl["Alchemy"] and tbl["AlchCD"] and pfUI_config.ProfessionCDs.transmute == "1" then
 			tempTBL[player..",AlchCD"] = tbl["AlchCD"]
 		end
-		if tbl["Leatherworking"] and tbl["SaltCD"] then
+		if tbl["Leatherworking"] and tbl["SaltCD"] and pfUI_config.ProfessionCDs.salt == "1" then
 			tempTBL[player..",SaltCD"] = tbl["SaltCD"]
 		end
 	end
