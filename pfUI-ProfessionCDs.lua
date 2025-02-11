@@ -183,11 +183,13 @@ pfUI:RegisterModule("ProfessionCDs", "vanilla", function ()
 				local ShortCD = ProfessionCDsShortestCD()
 				local data = ShortCD[1]
 				local alt,key = strsplit(",",data)
-				local cooldown = "Mooncloth"
-				if key == "AlchCD" then cooldown = "Transmute" end
-				if key == "SaltCD" then cooldown = "Refined Salt" end
-				local CDduration = SecondsToTime(ProfessionCDs[alt][key] - time())
-				output = red..CDduration
+				if key then
+					local cooldown = "Mooncloth"
+					if key == "AlchCD" then cooldown = "Transmute" end
+					if key == "SaltCD" then cooldown = "Refined Salt" end
+					local CDduration = SecondsToTime(ProfessionCDs[alt][key] - time())
+					output = red..CDduration
+				end
 			end
 			pfUI.panel:OutputPanel("professions", output, widget.Tooltip)
 		end)
